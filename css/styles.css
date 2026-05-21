@@ -1,0 +1,162 @@
+/* Custom CSS overrides and animation keyframes */
+
+/* Prevent scrollbar flashing during transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Tab Routing Transitions */
+.section-content {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hidden-section {
+  display: none !important;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Grab Cursor for 3D simulation stage */
+.grab-cursor {
+  cursor: grab;
+}
+.grab-cursor:active {
+  cursor: grabbing;
+}
+
+/* Shake animation for wrong answers in games */
+.shake-animation {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+/* Glow effects for science objects in dark mode */
+.dark .glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+}
+.dark .glow-emerald {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+.dark .glow-orange {
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
+}
+
+/* Confetti canvas */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Success flash for Game 2 Sorter */
+.success-flash {
+  animation: successFlash 0.4s ease-out;
+}
+
+@keyframes successFlash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(16, 185, 129, 0.2); }
+}
+
+/* Error flash for Game 2 Sorter */
+.error-flash {
+  animation: errorFlash 0.4s ease-out;
+}
+
+@keyframes errorFlash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(239, 68, 68, 0.2); }
+}
+
+/* Custom interactive active states */
+.active-blue-tab {
+  background-color: rgb(59, 130, 246);
+  color: white !important;
+}
+.dark .active-blue-tab {
+  background-color: rgb(37, 99, 235);
+}
+
+.active-green-tab {
+  background-color: rgb(16, 185, 129);
+  color: white !important;
+}
+.dark .active-green-tab {
+  background-color: rgb(5, 150, 105);
+}
+
+.active-orange-tab {
+  background-color: rgb(249, 115, 22);
+  color: white !important;
+}
+.dark .active-orange-tab {
+  background-color: rgb(234, 88, 12);
+}
+
+/* Debounce click helper class to temporarily disable user clicks */
+.pointer-events-none-override {
+  pointer-events: none !important;
+  opacity: 0.8;
+}
+
+/* Hearts animation */
+.heart-pulse {
+  animation: heartPulse 0.3s ease-out;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}

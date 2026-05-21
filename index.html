@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אלוטרופיית הפחמן - פרויקט 1000</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="פלטפורמה לימודית אינטראקטיבית ומשחקית בנושא אלוטרופיית הפחמן לתלמידי כיתה ט'. כולל מודלים תלת-ממדיים, משחקים ומבחנים.">
+  <meta name="keywords" content="פחמן, אלוטרופיה, כימיה כיתה ט, יהלום, גרפיט, גרפן, פולרן, ננוצינוריות">
+  
+  <!-- Google Fonts - Rubik (Multilingual support for Hebrew, Arabic, English) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="./css/styles.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Rubik', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-300">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Global Header -->
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-xl relative z-10 border-b border-indigo-500/20">
+    <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      
+      <!-- App Titles -->
+      <div class="space-y-1">
+        <h1 id="app-title-text" class="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-indigo-200">
+          אלוטרופיית הפחמן
+        </h1>
+        <p id="app-subtitle-text" class="text-xs md:text-sm text-cyan-300/80 font-medium">
+          מסע אינטראקטיבי בממלכת הפחמן - פרויקט 1000
+        </p>
+      </div>
+
+      <!-- Controls & Progression Profile -->
+      <div class="flex flex-wrap items-center gap-3 md:gap-4">
+        
+        <!-- Local Storage Progression System (Mastery Badge) -->
+        <div class="flex items-center gap-2 bg-white/10 dark:bg-slate-900/60 border border-white/20 dark:border-slate-800 px-3 py-1.5 rounded-full shadow-inner backdrop-blur-md">
+          <div class="w-6 h-6 rounded-full bg-cyan-400 flex items-center justify-center text-slate-950 font-bold text-xs animate-pulse">C</div>
+          <div class="text-[11px] md:text-xs">
+            <span id="mastery-lbl" class="text-slate-300 block">רמת מומחיות פחמן:</span>
+            <span id="user-mastery-level" class="font-bold text-cyan-300">טירון פחמן</span>
+          </div>
+        </div>
+
+        <!-- Dark Mode Toggle Button -->
+        <button id="dark-mode-toggle" class="p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-yellow-300 transition-all focus:outline-none" title="Toggle Light/Dark Theme">
+          <!-- Sun Icon (active in dark mode to switch to light) -->
+          <svg id="sun-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+          </svg>
+          <!-- Moon Icon (active in light mode) -->
+          <svg id="moon-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+
+        <!-- Floating Language Switcher Pill -->
+        <div class="flex bg-white/10 dark:bg-slate-900/60 p-1 rounded-full border border-white/10 shadow-inner">
+          <button id="lang-he" class="px-3 py-1 text-xs font-bold rounded-full transition-all bg-cyan-500 text-slate-950">עברית</button>
+          <button id="lang-en" class="px-3 py-1 text-xs font-medium rounded-full transition-all text-white hover:text-cyan-200">English</button>
+          <button id="lang-ar" class="px-3 py-1 text-xs font-medium rounded-full transition-all text-white hover:text-cyan-200">العربية</button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Bottom / Main Navigation Bar -->
+  <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-md sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-3">
+        
+        <!-- Navigation Clusters -->
+        <div class="flex flex-wrap gap-2 w-full justify-center sm:justify-start">
+          
+          <!-- Learning Area (Blue border) -->
+          <div class="flex p-0.5 rounded-xl border-2 border-blue-500/30 dark:border-blue-500/20 bg-blue-500/5 gap-1">
+            <button id="nav-btn-glossary" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-blue-600 dark:text-blue-400 active-blue-tab transition-all">
+              מילון מונחים
+            </button>
+            <button id="nav-btn-simulations" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 transition-all">
+              הדמיות תלת-ממד
+            </button>
+          </div>
+
+          <!-- Games Area (Green border) -->
+          <div class="flex p-0.5 rounded-xl border-2 border-emerald-500/30 dark:border-emerald-500/20 bg-emerald-500/5 gap-1">
+            <button id="nav-btn-game1" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-all">
+              מרוץ הפחמן
+            </button>
+            <button id="nav-btn-game2" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-all">
+              ממיין הפחמן
+            </button>
+          </div>
+
+          <!-- Exams Area (Orange border) -->
+          <div class="flex p-0.5 rounded-xl border-2 border-orange-500/30 dark:border-orange-500/20 bg-orange-500/5 gap-1">
+            <button id="nav-btn-quiz" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-all">
+              אימון מהיר
+            </button>
+            <button id="nav-btn-exam" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-all">
+              מבחן מסכם
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Active Content Canvas (Center Container) -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8 relative">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 transition-all duration-300 min-h-[500px] flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- ================= SECTION: GLOSSARY ================= -->
+      <section id="section-glossary" class="section-content fade-in space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+          <div>
+            <h2 id="glossary-header-title" class="text-2xl font-bold text-blue-600 dark:text-blue-400">מילון מונחים</h2>
+            <p id="glossary-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">חקור את המאפיינים, המבנים והשימושים של אלוטרופי הפחמן השונים.</p>
+          </div>
+          <!-- Glossary Search Engine -->
+          <div class="relative w-full md:w-80">
+            <span class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </span>
+            <input type="text" id="search-input" class="w-full ps-10 pe-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm" placeholder="חפש מושג או תכונה...">
+          </div>
+        </div>
+
+        <!-- Cards Container -->
+        <div id="glossary-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Cards injected dynamically via JS -->
+        </div>
+
+        <!-- Beautiful Empty State Container -->
+        <div id="glossary-empty-state" class="hidden flex-col items-center justify-center text-center py-12 space-y-4">
+          <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 animate-bounce">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <p id="no-results-text" class="text-slate-500 dark:text-slate-400 font-medium">לא מצאנו מושג כזה. נסה לחפש מילה אחרת.</p>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: SIMULATIONS ================= -->
+      <section id="section-simulations" class="section-content hidden-section space-y-6">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5">
+          <h2 id="sims-header-title" class="text-2xl font-bold text-blue-600 dark:text-blue-400">הדמיות תלת-ממד (Three.js)</h2>
+          <p id="sims-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">סובב וחקור את המבנים המולקולריים של אלוטרופי הפחמן השונים ברמת אטומים וקשרים.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Left Sidebar: Selection -->
+          <div class="lg:col-span-1 flex flex-col gap-3">
+            <h3 id="sims-select-allotrope-title" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">בחר אלוטרופ</h3>
+            <div id="allotrope-sim-selector" class="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 gap-2 w-full border-b lg:border-b-0 border-slate-100 dark:border-slate-800">
+              <!-- Selection Buttons injected dynamically via JS -->
+            </div>
+          </div>
+
+          <!-- Main 3D Canvas Stage -->
+          <div class="lg:col-span-3 flex flex-col gap-4">
+            
+            <!-- Canvas Window wrapper -->
+            <div class="relative bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden aspect-video flex items-center justify-center glow-cyan">
+              
+              <!-- Three.js Canvas mount -->
+              <div id="3d-canvas-container" class="absolute inset-0 w-full h-full grab-cursor"></div>
+
+              <!-- Interactive floating information panel inside Stage -->
+              <div class="absolute bottom-4 start-4 bg-slate-950/80 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-800 text-[11px] text-cyan-400 max-w-xs pointer-events-none">
+                <span id="control-inst-lbl" class="font-bold flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span id="control-inst-lbl-text">הוראות ניווט:</span>
+                </span>
+                <p id="control-inst-desc" class="text-slate-400 mt-1">גרור כדי לסובב | גלול כדי לקרב/להרחיק | קליק ימני+גרור להזזה</p>
+              </div>
+
+              <!-- Floating Reset View button inside container -->
+              <button id="reset-view-btn" class="absolute top-4 end-4 px-3 py-1.5 bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 rounded-lg text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md">
+                <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.5"></path>
+                </svg>
+                <span id="reset-view-lbl">אפס תצוגה</span>
+              </button>
+            </div>
+
+            <!-- View Levels Selector Bottom Bar -->
+            <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span id="view-level-title" class="font-bold text-xs md:text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider block">רמת תצוגה</span>
+                <span id="active-allotrope-label" class="text-lg font-bold text-slate-800 dark:text-slate-100 mt-0.5 block">יהלום</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button id="btn-view-single" class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                  אטום יחיד / קשר יחיד
+                </button>
+                <button id="btn-view-few" class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                  תא יחידה / שכבה קטנה
+                </button>
+                <button id="btn-view-full" class="px-4 py-2 text-xs font-bold rounded-xl border border-blue-500 bg-blue-500 text-white transition-all">
+                  סריג מורחב / מבנה מלא
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: GAME 1 (CARBON RACE) ================= -->
+      <section id="section-game1" class="section-content hidden-section space-y-6">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5">
+          <h2 id="race-header-title" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">מרוץ הפחמן: טריוויה מהירה</h2>
+          <p id="race-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">ענה על כמה שיותר שאלות נכונות בתוך 45 שניות. כל תשובה נכונה מעניקה 10 נקודות!</p>
+        </div>
+
+        <!-- Start Game Screen -->
+        <div id="game1-start-screen" class="flex flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto">
+          <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center text-4xl animate-bounce">
+            ⏱️
+          </div>
+          <div class="space-y-2">
+            <h3 id="race-banner-title" class="text-xl font-bold">האם אתם מוכנים למרוץ?</h3>
+            <p id="race-banner-desc" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">הטיימר יתחיל ברגע שתלחצו על כפתור ההתחלה. כל פגיעה נכונה מעניקה נקודות. שגיאה תגרום לרעידת מסך קלה, אך המרוץ ממשיך במהירות!</p>
+          </div>
+          
+          <!-- High score state from localStorage -->
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl flex items-center gap-6">
+            <span class="text-sm"><strong id="race-start-hs-lbl">שיא נוכחי:</strong> <span id="game1-hs-val" class="font-bold text-emerald-500">0</span></span>
+          </div>
+
+          <button id="game1-start-btn" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-emerald-500/20 active:scale-95 transition-all">
+            התחל משחק
+          </button>
+        </div>
+
+        <!-- Active Game Layout -->
+        <div id="game1-active-layout" class="hidden space-y-6">
+          <!-- HUD Header -->
+          <div class="grid grid-cols-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 text-center font-bold text-sm md:text-base">
+            <div>
+              <span id="race-hud-time-lbl" class="text-slate-400 block text-xs font-semibold">זמן</span>
+              <span id="game1-timer" class="text-2xl text-red-500">45</span>
+            </div>
+            <div class="border-x border-slate-200 dark:border-slate-800">
+              <span id="race-hud-score-lbl" class="text-slate-400 block text-xs font-semibold">ניקוד</span>
+              <span id="game1-score" class="text-2xl text-emerald-500">0</span>
+            </div>
+            <div>
+              <span id="race-hud-hs-lbl" class="text-slate-400 block text-xs font-semibold">שיא</span>
+              <span id="game1-active-hs" class="text-2xl text-blue-500">0</span>
+            </div>
+          </div>
+
+          <!-- Question Box -->
+          <div id="game1-question-card" class="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-850 p-6 md:p-8 rounded-3xl text-center shadow-sm">
+            <span id="race-question-tag" class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-xs font-bold mb-3 uppercase tracking-wider">שאלה מהירה</span>
+            <p id="game1-question-text" class="text-lg md:text-xl font-bold leading-relaxed">טוען שאלה...</p>
+          </div>
+
+          <!-- Answers Box -->
+          <div id="game1-answers-box" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Chunk buttons loaded dynamically -->
+          </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game1-gameover-screen" class="hidden flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto">
+          <div id="game1-trophy-icon" class="w-20 h-20 bg-yellow-500/10 text-yellow-500 rounded-full flex items-center justify-center text-4xl">
+            🏆
+          </div>
+          <div class="space-y-2">
+            <h3 id="race-go-title" class="text-2xl font-black text-slate-800 dark:text-slate-100">המשחק נגמר!</h3>
+            <p id="game1-gameover-msg" class="text-sm text-slate-500 dark:text-slate-400">כל הכבוד! הגעת לקצה גבול היכולת.</p>
+          </div>
+
+          <div class="grid grid-cols-2 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl w-full text-center gap-4">
+            <div>
+              <span id="race-go-score-lbl" class="text-slate-400 block text-xs">ציון סופי:</span>
+              <span id="game1-final-score" class="text-3xl font-extrabold text-emerald-500">0</span>
+            </div>
+            <div>
+              <span id="race-go-hs-lbl" class="text-slate-400 block text-xs">שיא נוכחי:</span>
+              <span id="game1-final-hs" class="text-3xl font-extrabold text-blue-500">0</span>
+            </div>
+          </div>
+
+          <!-- Pulse badge for new high scores -->
+          <div id="game1-new-record-badge" class="hidden px-4 py-2 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded-full font-bold text-sm animate-pulse border border-yellow-500/30">
+            🎉 שיא חדש! כל הכבוד! 🎉
+          </div>
+
+          <button id="game1-restart-btn" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-emerald-500/20 active:scale-95 transition-all">
+            שחק שוב
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: GAME 2 (CARBON SORTER) ================= -->
+      <section id="section-game2" class="section-content hidden-section space-y-6">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5">
+          <h2 id="sorter-header-title" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">ממיין הפחמן: מיון תכונות</h2>
+          <p id="sorter-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">גרור או לחץ על התכונה כדי למיין אותה לאלוטרופ הנכון. יש לך 3 חיים. היזהר!</p>
+        </div>
+
+        <!-- Start Game Screen -->
+        <div id="game2-start-screen" class="flex flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto">
+          <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center text-4xl animate-bounce">
+            🗳️
+          </div>
+          <div class="space-y-2">
+            <h3 id="sorter-banner-title" class="text-xl font-bold">האם אתם מומחים במיון?</h3>
+            <p id="sorter-banner-desc" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">שייכו את התכונות הכימיות והפיזיקליות השונות לחמשת האלוטרופים: יהלום, גרפיט, גרפן, פולרן C60 או ננו-צינוריות. טעות אחת תעלה לכם בחיים!</p>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 px-6 py-3 rounded-2xl flex items-center gap-6">
+            <span class="text-sm"><strong id="sorter-start-hs-lbl">שיא נוכחי:</strong> <span id="game2-hs-val" class="font-bold text-emerald-500">0</span></span>
+          </div>
+
+          <button id="game2-start-btn" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-emerald-500/20 active:scale-95 transition-all">
+            התחל משחק
+          </button>
+        </div>
+
+        <!-- Active Game Layout -->
+        <div id="game2-active-layout" class="hidden space-y-6">
+          <!-- HUD Header -->
+          <div class="grid grid-cols-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 text-center font-bold text-sm md:text-base">
+            <div>
+              <span id="sorter-hud-lives-lbl" class="text-slate-400 block text-xs font-semibold">חיים</span>
+              <!-- Hearts HUD -->
+              <div id="game2-lives-container" class="flex justify-center items-center gap-1.5 mt-0.5">
+                <span id="life-1" class="text-xl text-red-500 heart-pulse">❤️</span>
+                <span id="life-2" class="text-xl text-red-500 heart-pulse">❤️</span>
+                <span id="life-3" class="text-xl text-red-500 heart-pulse">❤️</span>
+              </div>
+            </div>
+            <div class="border-x border-slate-200 dark:border-slate-800">
+              <span id="sorter-hud-score-lbl" class="text-slate-400 block text-xs font-semibold">ניקוד</span>
+              <span id="game2-score" class="text-2xl text-emerald-500">0</span>
+            </div>
+            <div>
+              <span id="sorter-hud-hs-lbl" class="text-slate-400 block text-xs font-semibold">שיא</span>
+              <span id="game2-active-hs" class="text-2xl text-blue-500">0</span>
+            </div>
+          </div>
+
+          <!-- Drag and Click Card Stage -->
+          <div id="game2-sorter-area" class="flex flex-col items-center justify-center p-6 md:p-10 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-850 rounded-3xl relative overflow-hidden transition-all shadow-sm">
+            <span id="sorter-question-tag" class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-xs font-bold mb-4 uppercase tracking-wider">תכונה למיון</span>
+            
+            <!-- Draggable Property Card -->
+            <div id="game2-property-card" draggable="true" class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 p-6 rounded-2xl shadow-lg text-center font-bold text-base md:text-lg cursor-grab active:cursor-grabbing hover:scale-[1.02] transition-transform select-none">
+              טוען תכונה...
+            </div>
+            
+            <p id="sorter-instruction-lbl" class="text-xs text-slate-500 dark:text-slate-400 mt-4">גרור את הכרטיס מעלה אל אחד המיכלים, או לחץ ישירות על המיכל המתאים למטה.</p>
+          </div>
+
+          <!-- Bins Container (Target Zones) -->
+          <div id="game2-bins-container" class="grid grid-cols-2 md:grid-cols-5 gap-3 w-full">
+            <!-- Bins dynamically rendered inside JS to match language categories -->
+          </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game2-gameover-screen" class="hidden flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto">
+          <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-4xl">
+            💔
+          </div>
+          <div class="space-y-2">
+            <h3 id="sorter-go-title" class="text-2xl font-black text-slate-800 dark:text-slate-100">המשחק נגמר!</h3>
+            <p id="game2-gameover-msg" class="text-sm text-slate-500 dark:text-slate-400">אזלו לך כל החיים. אל תתייאש, נסה שוב ולמד מהשגיאות!</p>
+          </div>
+
+          <div class="grid grid-cols-2 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl w-full text-center gap-4">
+            <div>
+              <span id="sorter-go-score-lbl" class="text-slate-400 block text-xs">ציון סופי:</span>
+              <span id="game2-final-score" class="text-3xl font-extrabold text-emerald-500">0</span>
+            </div>
+            <div>
+              <span id="sorter-go-hs-lbl" class="text-slate-400 block text-xs">שיא נוכחי:</span>
+              <span id="game2-final-hs" class="text-3xl font-extrabold text-blue-500">0</span>
+            </div>
+          </div>
+
+          <!-- High score notification -->
+          <div id="game2-new-record-badge" class="hidden px-4 py-2 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded-full font-bold text-sm animate-pulse border border-yellow-500/30">
+            🎉 שיא חדש! כל הכבוד! 🎉
+          </div>
+
+          <button id="game2-restart-btn" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-emerald-500/20 active:scale-95 transition-all">
+            שחק שוב
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: PRACTICE QUIZ ================= -->
+      <section id="section-quiz" class="section-content hidden-section space-y-6">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5">
+          <h2 id="quiz-header-title" class="text-2xl font-bold text-orange-600 dark:text-orange-400 font-extrabold">אימון מהיר: 10 שאלות</h2>
+          <p id="quiz-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">תרגל את הידע שלך עם רמזים והסברים מיידיים לכל שאלה.</p>
+        </div>
+
+        <!-- Start Quiz Screen -->
+        <div id="quiz-start-screen" class="flex flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto">
+          <div class="w-20 h-20 bg-orange-500/10 text-orange-500 rounded-full flex items-center justify-center text-4xl animate-bounce">
+            📝
+          </div>
+          <div class="space-y-2">
+            <h3 id="quiz-banner-title" class="text-xl font-bold">מוכנים לאימון זריז?</h3>
+            <p id="quiz-banner-desc" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">אימון זה כולל 10 שאלות מרובות ברירה עם מערכת רמזים מובנית והסברים מדעיים מפורטים שמוצגים מיד לאחר שתענה על כל שאלה.</p>
+          </div>
+          <button id="quiz-start-btn" class="w-full sm:w-auto px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-orange-500/20 active:scale-95 transition-all">
+            התחל משחק
+          </button>
+        </div>
+
+        <!-- Active Quiz Stage -->
+        <div id="quiz-active-layout" class="hidden space-y-6">
+          
+          <!-- HUD Header -->
+          <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl px-6 py-4 shadow-sm">
+            <span id="quiz-count-text" class="font-bold text-slate-800 dark:text-slate-200">שאלה 1 מתוך 10</span>
+            <button id="quiz-hint-btn" class="px-3.5 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 font-semibold text-xs rounded-xl transition-all border border-orange-500/20">
+              הצג רמז
+            </button>
+          </div>
+
+          <!-- Hint display area -->
+          <div id="quiz-hint-text" class="hidden p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-800 dark:text-yellow-400 text-xs md:text-sm rounded-xl transition-all">
+            רמז יופיע כאן...
+          </div>
+
+          <!-- Question box -->
+          <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-850 p-6 md:p-8 rounded-3xl shadow-sm">
+            <p id="quiz-question-text" class="text-base md:text-lg font-bold leading-relaxed">טוען שאלה...</p>
+          </div>
+
+          <!-- Options box -->
+          <div id="quiz-options-box" class="flex flex-col gap-3">
+            <!-- Injected options -->
+          </div>
+
+          <!-- Immediate Feedback Explanation container -->
+          <div id="quiz-feedback" class="hidden p-5 rounded-2xl border transition-all text-xs md:text-sm leading-relaxed">
+            <p id="quiz-feedback-title" class="font-bold text-sm mb-1"></p>
+            <p id="quiz-feedback-explanation" class="text-slate-600 dark:text-slate-300"></p>
+          </div>
+
+          <!-- Next Button -->
+          <div class="flex justify-end mt-4">
+            <button id="quiz-next-btn" class="hidden px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-md transition-all">
+              השאלה הבאה
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Quiz Summary screen -->
+        <div id="quiz-results-screen" class="hidden flex-col items-center justify-center py-12 text-center space-y-6 max-w-xl mx-auto animate-fadeIn">
+          <div class="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center text-4xl">
+            🎓
+          </div>
+          <div class="space-y-2">
+            <h3 id="quiz-res-title" class="text-2xl font-black text-slate-800 dark:text-slate-100">סיימת את האימון המהיר!</h3>
+            <p id="quiz-results-msg" class="text-sm text-slate-500 dark:text-slate-400">אימון מביא לשלמות. כעת אתה מוכן יותר למבחן המסכם.</p>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 p-6 rounded-2xl w-full text-center">
+            <span id="quiz-res-sc-lbl" class="text-slate-400 block text-xs">ציון אימון:</span>
+            <span id="quiz-final-score" class="text-4xl font-extrabold text-orange-500">0 / 10</span>
+          </div>
+
+          <button id="quiz-restart-btn" class="w-full sm:w-auto px-8 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-lg rounded-2xl shadow-lg hover:shadow-orange-500/20 active:scale-95 transition-all">
+            שחק שוב
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= SECTION: FINAL EXAM ================= -->
+      <section id="section-exam" class="section-content hidden-section space-y-6">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 id="exam-header-title" class="text-2xl font-bold text-orange-600 dark:text-orange-400 font-extrabold">מבחן מסכם: 25 שאלות</h2>
+            <p id="exam-header-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">מבחן מקיף על כל תכונות הפחמן. עליך לענות על כל השאלות כדי להגיש. אין הגבלת זמן, בהצלחה!</p>
+          </div>
+          <!-- Sticky Floating Results Panel (Hidden by default, shown after submit) -->
+          <div id="exam-results-screen" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 md:px-6 md:py-3 flex items-center gap-4 animate-pulse">
+            <div>
+              <span id="exam-grade-lbl" class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block">הציון שלך:</span>
+              <span id="exam-final-grade" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">100</span>
+            </div>
+            <div class="h-8 w-px bg-slate-200 dark:bg-slate-800"></div>
+            <div class="text-xs text-slate-600 dark:text-slate-300">
+              <span id="exam-status-msg" class="font-bold block">עברת בהצלחה! מדהים!</span>
+              <span id="exam-grade-count" class="text-slate-400">25 מתוך 25 תשובות נכונות</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning Disclaimer after submission -->
+        <div id="exam-disclaimer-box" class="hidden p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs md:text-sm text-slate-500 dark:text-slate-400">
+          ⚠️ <span id="exam-disclaimer-text">המבחן ננעל. התשובות הנכונות מסומנות בירוק, והשגיאות שלך מסומנות באדום למטה.</span>
+        </div>
+
+        <!-- Vertical Scroll container for all 25 Questions -->
+        <div id="exam-questions-scroll" class="space-y-8 divide-y divide-slate-100 dark:divide-slate-800 max-h-[600px] overflow-y-auto pr-2">
+          <!-- 25 Questions injected via JS -->
+        </div>
+
+        <!-- Submit Exam Area -->
+        <div class="flex justify-center border-t border-slate-100 dark:border-slate-800 pt-6">
+          <button id="exam-submit-btn" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-extrabold text-lg rounded-2xl shadow-xl hover:shadow-orange-500/20 active:scale-95 transition-all">
+            הגש מבחן
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-850 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
+      
+      <!-- Pulsing Brand Logo Icon -->
+      <div class="flex justify-center items-center gap-2">
+        <span class="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-ping"></span>
+        <span id="footer-brand" class="text-white font-bold text-sm tracking-wider uppercase">Project 1000 - אלוטרופיית הפחמן</span>
+      </div>
+
+      <div class="text-xs space-y-1">
+        <p id="footer-credits">פותח עבור תלמידי כיתה ט' במדעים | משרד החינוך</p>
+        <p id="footer-author">כל הזכויות שמורות © 2026</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= DIALOG MODALS ================= -->
+
+  <!-- Modal: Unanswered Questions Warning -->
+  <div id="exam-modal" class="fixed inset-0 z-50 bg-slate-950/75 flex items-center justify-center px-4 hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 md:p-8 space-y-6 shadow-2xl text-center">
+      <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto">
+        ⚠️
+      </div>
+      <div class="space-y-2">
+        <h3 id="modal-warning-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">מבחן לא מושלם!</h3>
+        <p id="modal-warning-desc" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">לא ענית על כל 25 השאלות. אנא השלם את השאלות החסרות המודגשות באדום.</p>
+      </div>
+      <button id="modal-close-btn" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-all shadow-lg shadow-red-500/10">
+        חזור למבחן
+      </button>
+    </div>
+  </div>
+
+  <!-- External Library JS links -->
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Orbit Controls for Three.js (Must load after core Three.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- canvas-confetti Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Core Logic JavaScript Modules -->
+  <script src="./js/data.js"></script>
+  <script src="./js/games.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

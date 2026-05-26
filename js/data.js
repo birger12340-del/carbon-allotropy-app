@@ -4,7 +4,7 @@
 const translations = {
   he: {
     appTitle: "אלוטרופיית הפחמן",
-    appSubtitle: "מסע אינטראקטיבי בממלכת הפחמן - פרויקט 1000",
+    appSubtitle: "מסע אינטראקטיבי בממלכת הפחמן",
     masteryLevel: "רמת מומחיות פחמן:",
     levelNovice: "טירון פחמן",
     levelApprentice: "שוליה",

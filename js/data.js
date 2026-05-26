@@ -89,7 +89,7 @@ const translations = {
 
     // Footer
     branding: "Project 1000 - אלוטרופיית הפחמן",
-    credits: "פותח עבור תלמידי כיתה ט' במדעים | משרד החינוך",
+    credits: "פותח עבור תלמידי כיתה ט' במדעים | איתמר בירגר",
     author: "כל הזכויות שמורות © 2026",
     raceQuestionTag: "שאלה מהירה",
     sorterQuestionTag: "תכונה למיון",
